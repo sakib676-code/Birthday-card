@@ -1,0 +1,724 @@
+/* =====================================================================
+   HAPPY BIRTHDAY — stylesheet
+   ---------------------------------------------------------------------
+   Sections in this file:
+     1. Colours & fonts (change things here first)
+     2. Base + shared pieces (buttons, navigation, music button)
+     3. Screen 1  — intro
+     4. Screen 2  — polaroid question
+     5. Screen 3  — memory
+     6. Screen 4  — wish / constellation
+     7. Screen 5  — letter
+     8. Screen 6  — last question
+     9. Screen 7  — celebration
+    10. Phones & tablets
+   ===================================================================== */
+
+
+/* ---------------------------------------------------------------------
+   1. COLOURS & FONTS  ← start customising here
+   --------------------------------------------------------------------- */
+:root {
+  /* Colours */
+  --night:     #170A1E;   /* deepest background */
+  --wine:      #3B1033;   /* second background tone */
+  --plum:      #5A1B45;   /* lighter background tone */
+  --gold:      #E9C27E;   /* main accent (buttons, titles) */
+  --blush:     #F3A8BC;   /* second accent (hearts, glow) */
+  --cream:     #FBF4EA;   /* light text + paper screens */
+  --ink:       #2A1420;   /* dark text on the paper screens */
+
+  /* Fonts. Left name = Google font, the rest = offline fallbacks. */
+  --font-display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --font-body:    "Jost", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-hand:    "Caveat", "Segoe Script", "Bradley Hand", cursive;
+
+  /* Shape & motion */
+  --radius: 18px;
+  --ease: cubic-bezier(.22, .61, .36, 1);
+}
+
+
+/* ---------------------------------------------------------------------
+   2. BASE + SHARED PIECES
+   --------------------------------------------------------------------- */
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--night);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.6;
+  overflow: hidden;                 /* each screen scrolls on its own */
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* --- the screens themselves --- */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(20px, 5vw, 56px);
+  padding-top: calc(clamp(20px, 5vw, 56px) + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(clamp(20px, 5vw, 56px) + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  opacity: 0;
+  transform: scale(1.03);
+  transition: opacity .55s var(--ease), transform .55s var(--ease);
+}
+.screen[hidden] { display: none; }
+.screen.is-active { opacity: 1; transform: none; }
+
+/* canvases used for hearts, stars and confetti */
+.fx {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* --- buttons --- */
+.btn {
+  font-family: var(--font-body);
+  font-size: clamp(.95rem, .9rem + .3vw, 1.05rem);
+  font-weight: 400;
+  letter-spacing: .02em;
+  padding: .85em 1.7em;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease),
+              background .25s var(--ease), color .25s var(--ease);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+
+.btn--gold {
+  background: linear-gradient(135deg, var(--gold), #F6DCB2);
+  color: var(--ink);
+  box-shadow: 0 12px 34px -14px var(--gold);
+}
+.btn--gold:hover { box-shadow: 0 18px 40px -14px var(--gold); }
+
+.btn--glass {
+  background: rgba(255, 255, 255, .08);
+  color: var(--cream);
+  border-color: rgba(255, 255, 255, .28);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.btn--glass:hover { background: rgba(255, 255, 255, .16); }
+
+.btn--ink {
+  background: var(--ink);
+  color: var(--cream);
+  box-shadow: 0 12px 30px -16px rgba(42, 20, 32, .9);
+}
+
+.btn--outline {
+  background: transparent;
+  color: var(--ink);
+  border-color: rgba(42, 20, 32, .35);
+}
+.btn--outline:hover { background: rgba(42, 20, 32, .07); }
+
+.btn--ghost {
+  background: transparent;
+  color: rgba(251, 244, 234, .75);
+  border-color: rgba(251, 244, 234, .3);
+}
+.btn--ghost:hover { color: var(--cream); }
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* --- small navigation row at the bottom of a screen --- */
+.nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 26px;
+}
+.nav__btn {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  color: inherit;
+  opacity: .55;
+  font-family: var(--font-body);
+  font-size: .85rem;
+  letter-spacing: .06em;
+  padding: 4px 2px;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+.nav__btn:hover { opacity: 1; }
+.nav__btn--next { opacity: .85; }
+
+/* --- headings & replies shared by several screens --- */
+.question {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 1.2rem + 2.2vw, 2.6rem);
+  line-height: 1.2;
+  margin: 0 0 1.1em;
+  max-width: 18ch;
+}
+.question--light { color: var(--cream); }
+
+.reply {
+  min-height: 1.6em;
+  margin: 14px 0 0;
+  font-family: var(--font-hand);
+  font-size: 1.35rem;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .5s, transform .5s;
+}
+.reply.is-shown { opacity: .95; transform: none; }
+.reply--light { color: var(--blush); }
+
+.choices { display: flex; gap: 12px; flex-wrap: wrap; }
+.choices--row { justify-content: flex-start; }
+
+/* --- floating music button --- */
+.music-toggle {
+  position: fixed;
+  z-index: 40;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  right: 16px;
+  width: 48px; height: 48px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(251, 244, 234, .3);
+  background: rgba(23, 10, 30, .45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+.music-toggle__bars { display: flex; align-items: flex-end; gap: 3px; height: 18px; }
+.music-toggle__bars i {
+  width: 3px; height: 100%;
+  background: var(--gold);
+  border-radius: 2px;
+  transform-origin: bottom;
+  animation: equalize .9s ease-in-out infinite alternate;
+}
+.music-toggle__bars i:nth-child(2) { animation-delay: .15s; }
+.music-toggle__bars i:nth-child(3) { animation-delay: .3s; }
+.music-toggle__bars i:nth-child(4) { animation-delay: .45s; }
+@keyframes equalize { from { transform: scaleY(.25); } to { transform: scaleY(1); } }
+
+.music-toggle.is-muted .music-toggle__bars i {
+  animation: none;
+  transform: scaleY(.25);
+  background: rgba(251, 244, 234, .4);
+}
+
+/* --- progress dots --- */
+.progress {
+  position: fixed;
+  z-index: 40;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  gap: 8px;
+}
+.progress i {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(251, 244, 234, .28);
+  transition: background .3s, transform .3s;
+}
+.progress i.is-on { background: var(--gold); transform: scale(1.5); }
+
+/* the dots need to be dark on the two light screens */
+body[data-screen="2"] .progress i,
+body[data-screen="5"] .progress i { background: rgba(42, 20, 32, .25); }
+body[data-screen="2"] .progress i.is-on,
+body[data-screen="5"] .progress i.is-on { background: var(--plum); }
+body[data-screen="2"] .music-toggle,
+body[data-screen="5"] .music-toggle {
+  background: rgba(255, 255, 255, .5);
+  border-color: rgba(42, 20, 32, .18);
+}
+
+
+/* ---------------------------------------------------------------------
+   3. SCREEN 1 — INTRO (cinematic)
+   --------------------------------------------------------------------- */
+.screen--intro { background: radial-gradient(120% 90% at 50% 10%, var(--wine), var(--night) 65%); }
+
+.intro__aurora {
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(38% 30% at 25% 30%, rgba(243, 168, 188, .38), transparent 70%),
+    radial-gradient(34% 28% at 75% 65%, rgba(233, 194, 126, .28), transparent 70%),
+    radial-gradient(40% 35% at 55% 85%, rgba(90, 27, 69, .55), transparent 70%);
+  filter: blur(30px);
+  animation: drift 26s ease-in-out infinite alternate;
+}
+@keyframes drift {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to   { transform: translate3d(3%, 3%, 0) scale(1.12); }
+}
+
+.intro__inner {
+  position: relative;
+  text-align: center;
+  max-width: 620px;
+  animation: riseIn 1.4s var(--ease) both;
+}
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.portrait {
+  margin: 0 auto 30px;
+  width: clamp(170px, 42vw, 250px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  padding: 6px;
+  background: conic-gradient(from 0deg, var(--gold), var(--blush), var(--gold));
+  box-shadow: 0 0 60px -10px rgba(243, 168, 188, .5);
+  animation: haloSpin 18s linear infinite;
+}
+.portrait img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid var(--night);
+  animation: haloSpin 18s linear infinite reverse;
+}
+@keyframes haloSpin { to { transform: rotate(360deg); } }
+
+.intro__eyebrow {
+  font-family: var(--font-hand);
+  font-size: 1.3rem;
+  color: var(--blush);
+  margin: 0 0 6px;
+}
+.intro__title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2.4rem, 1.6rem + 5vw, 4.6rem);
+  line-height: 1.05;
+  margin: 0 0 .35em;
+  color: var(--cream);
+  text-shadow: 0 10px 40px rgba(0, 0, 0, .5);
+}
+.intro__title .heart { color: var(--blush); }
+.intro__subtitle {
+  margin: 0 auto 2em;
+  max-width: 46ch;
+  color: rgba(251, 244, 234, .8);
+  font-size: clamp(.95rem, .9rem + .4vw, 1.1rem);
+}
+.intro__hint {
+  margin: 18px 0 0;
+  font-size: .8rem;
+  letter-spacing: .08em;
+  color: rgba(251, 244, 234, .45);
+}
+
+
+/* ---------------------------------------------------------------------
+   4. SCREEN 2 — POLAROID QUESTION (light, playful)
+   --------------------------------------------------------------------- */
+.screen--polaroid {
+  background:
+    radial-gradient(60% 50% at 80% 10%, rgba(243, 168, 188, .35), transparent 60%),
+    linear-gradient(160deg, #FFF6F0, #F6E3E7 70%, #EFD3DC);
+  color: var(--ink);
+}
+
+.paper__inner {
+  display: grid;
+  grid-template-columns: auto minmax(260px, 1fr);
+  gap: clamp(24px, 5vw, 60px);
+  align-items: center;
+  max-width: 900px;
+}
+
+.polaroid {
+  margin: 0;
+  background: #fff;
+  padding: 14px 14px 58px;
+  width: clamp(200px, 34vw, 300px);
+  border-radius: 4px;
+  transform: rotate(-4deg);
+  box-shadow: 0 30px 60px -28px rgba(42, 20, 32, .55);
+  position: relative;
+  transition: transform .5s var(--ease);
+}
+.polaroid:hover { transform: rotate(-1deg) scale(1.02); }
+.polaroid::before {           /* the tape */
+  content: "";
+  position: absolute;
+  top: -14px; left: 50%;
+  width: 96px; height: 28px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: rgba(233, 194, 126, .45);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .4);
+}
+.polaroid img { aspect-ratio: 1; object-fit: cover; }
+.polaroid figcaption {
+  position: absolute;
+  bottom: 16px; left: 0; right: 0;
+  text-align: center;
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  color: rgba(42, 20, 32, .7);
+}
+
+.polaroid__side .question { color: var(--ink); }
+.polaroid__side .nav { justify-content: flex-start; }
+.polaroid__side .reply { color: var(--plum); }
+
+
+/* ---------------------------------------------------------------------
+   5. SCREEN 3 — MEMORY (full-bleed photo)
+   --------------------------------------------------------------------- */
+.screen--memory {
+  place-items: end start;
+  background: var(--night);
+}
+.memory__photo {
+  position: absolute;
+  inset: 0;
+  /* ==== YOUR PHOTO 3 GOES HERE ==== */
+  background-image:
+    linear-gradient(to top, rgba(23, 10, 30, .96) 8%, rgba(23, 10, 30, .55) 45%, rgba(23, 10, 30, .25)),
+    url("images/photo3.jpg");
+  background-size: cover;
+  background-position: center 30%;
+  animation: slowZoom 22s ease-out forwards;
+}
+@keyframes slowZoom { from { transform: scale(1.12); } to { transform: scale(1); } }
+
+.memory__inner { position: relative; max-width: 640px; }
+.memory__line {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.1rem, 1rem + 1vw, 1.5rem);
+  color: rgba(251, 244, 234, .8);
+  margin: 0 0 .2em;
+}
+.memory__line--big {
+  font-style: normal;
+  font-size: clamp(1.4rem, 1.1rem + 1.8vw, 2.1rem);
+  color: var(--cream);
+  margin-bottom: 1.4em;
+}
+.memory__inner .question { font-size: clamp(1.25rem, 1.05rem + 1vw, 1.7rem); max-width: 26ch; }
+
+.choices--chips { gap: 10px; }
+.chip {
+  font-family: var(--font-body);
+  font-size: .95rem;
+  color: var(--cream);
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 999px;
+  padding: .7em 1.2em;
+  cursor: pointer;
+  transition: background .25s, border-color .25s, transform .25s var(--ease);
+}
+.chip:hover { background: rgba(255, 255, 255, .14); transform: translateY(-2px); }
+.chip.is-selected {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+.memory__inner .nav { justify-content: flex-start; }
+
+
+/* ---------------------------------------------------------------------
+   6. SCREEN 4 — THE WISH (constellation)
+   --------------------------------------------------------------------- */
+.screen--wish { background: radial-gradient(90% 70% at 50% 0%, #241035, #0C0512 70%); }
+
+.wish__inner {
+  position: relative;
+  width: min(560px, 100%);
+  text-align: center;
+  display: grid;
+  justify-items: center;
+}
+
+.orb {
+  margin: 0 0 26px;
+  width: clamp(130px, 30vw, 180px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(243, 168, 188, .5);
+  box-shadow: 0 0 0 10px rgba(243, 168, 188, .06), 0 0 70px -12px rgba(243, 168, 188, .6);
+}
+.orb img { width: 100%; height: 100%; object-fit: cover; }
+
+.wish__inner .question { max-width: 24ch; }
+
+.wish__input {
+  width: 100%;
+  font-family: var(--font-hand);
+  font-size: 1.3rem;
+  color: var(--cream);
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  resize: vertical;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  margin-bottom: 18px;
+}
+.wish__input::placeholder { color: rgba(251, 244, 234, .35); font-family: var(--font-body); font-size: .95rem; }
+.wish__input:focus { border-color: var(--blush); outline: none; }
+
+
+/* ---------------------------------------------------------------------
+   7. SCREEN 5 — THE LETTER (paper)
+   --------------------------------------------------------------------- */
+.screen--letter {
+  background: linear-gradient(160deg, #F7EFE2, #EFE2D2);
+  color: var(--ink);
+  align-items: start;
+}
+
+.letter {
+  position: relative;
+  width: min(720px, 100%);
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 31px, rgba(42, 20, 32, .07) 31px 32px),
+    #FFFCF6;
+  border-radius: 6px;
+  padding: clamp(28px, 5vw, 56px);
+  box-shadow: 0 40px 70px -40px rgba(42, 20, 32, .6);
+  margin: auto;
+}
+.letter::after {              /* folded corner */
+  content: "";
+  position: absolute;
+  right: 0; bottom: 0;
+  border: 26px solid transparent;
+  border-right-color: #EADFCD;
+  border-bottom-color: #EADFCD;
+}
+
+.snapshot {
+  float: right;
+  margin: 0 0 16px 22px;
+  width: clamp(110px, 24vw, 170px);
+  background: #fff;
+  padding: 9px 9px 9px;
+  transform: rotate(5deg);
+  box-shadow: 0 20px 40px -22px rgba(42, 20, 32, .7);
+}
+.snapshot img { aspect-ratio: 3 / 4; object-fit: cover; }
+
+.letter__head {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.4rem, 1.1rem + 1.4vw, 2rem);
+  margin: 0 0 .6em;
+  color: var(--plum);
+}
+.letter__body {
+  font-family: var(--font-hand);
+  font-size: clamp(1.25rem, 1.1rem + .8vw, 1.6rem);
+  line-height: 32px;              /* matches the ruled lines above */
+  white-space: pre-wrap;
+  margin: 0;
+  min-height: 12em;
+}
+.letter__body .caret {
+  display: inline-block;
+  width: 2px; height: 1em;
+  background: var(--plum);
+  vertical-align: -2px;
+  animation: blink .9s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+.nav--letter { clear: both; justify-content: flex-start; }
+
+
+/* ---------------------------------------------------------------------
+   8. SCREEN 6 — LAST QUESTION (split)
+   --------------------------------------------------------------------- */
+.screen--ask {
+  padding: 0;
+  place-items: stretch;
+  grid-template-columns: 1fr 1fr;
+  background: linear-gradient(120deg, #2A0E26, #4A1339);
+}
+.ask__photo { position: relative; overflow: hidden; }
+.ask__photo img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.ask__photo::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(23, 10, 30, .35), rgba(74, 19, 57, .85));
+}
+.ask__inner {
+  display: grid;
+  align-content: center;
+  padding: clamp(26px, 5vw, 70px);
+  padding-top: calc(clamp(26px, 5vw, 70px) + env(safe-area-inset-top, 0px));
+}
+.ask__kicker {
+  font-family: var(--font-hand);
+  color: var(--blush);
+  font-size: 1.4rem;
+  margin: 0 0 .2em;
+}
+.ask__inner .nav { justify-content: flex-start; }
+
+
+/* ---------------------------------------------------------------------
+   9. SCREEN 7 — CELEBRATION
+   --------------------------------------------------------------------- */
+.screen--final {
+  background: radial-gradient(100% 80% at 50% 0%, #4A1339, #140718 70%);
+  align-items: start;
+}
+.final__inner {
+  position: relative;
+  width: min(760px, 100%);
+  text-align: center;
+  margin: auto;
+}
+
+.frame {
+  margin: 0 auto 26px;
+  width: clamp(180px, 40vw, 260px);
+  padding: 10px;
+  border-radius: 200px 200px 14px 14px;      /* arched photo frame */
+  background: linear-gradient(160deg, var(--gold), #7A4F2A);
+  box-shadow: 0 30px 70px -30px rgba(233, 194, 126, .7);
+}
+.frame img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 190px 190px 8px 8px;
+}
+
+.final__title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2rem, 1.4rem + 3.4vw, 3.4rem);
+  margin: 0 0 .3em;
+  color: var(--cream);
+}
+.final__message {
+  max-width: 52ch;
+  margin: 0 auto 2em;
+  color: rgba(251, 244, 234, .82);
+}
+
+.recap {
+  display: grid;
+  gap: 12px;
+  text-align: left;
+  margin-bottom: 30px;
+}
+.recap__item {
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-left: 3px solid var(--blush);
+  border-radius: 4px 14px 14px 4px;
+  padding: 14px 18px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.recap__label {
+  display: block;
+  font-size: .78rem;
+  letter-spacing: .1em;
+  color: rgba(251, 244, 234, .55);
+  margin-bottom: 2px;
+}
+.recap__value { font-family: var(--font-hand); font-size: 1.3rem; color: var(--cream); }
+
+.final__actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+
+/* ---------------------------------------------------------------------
+   10. PHONES & TABLETS
+   --------------------------------------------------------------------- */
+@media (max-width: 820px) {
+  .paper__inner {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+  .polaroid__side .question { max-width: none; }
+  .polaroid__side .choices,
+  .polaroid__side .nav { justify-content: center; }
+
+  .screen--ask { grid-template-columns: 1fr; grid-template-rows: 38vh 1fr; }
+  .ask__photo::after { background: linear-gradient(180deg, rgba(23, 10, 30, .2), rgba(74, 19, 57, .9)); }
+}
+
+@media (max-width: 560px) {
+  .screen { padding: 22px 18px 64px; }
+  .screen--memory { place-items: end stretch; }
+  .memory__photo { background-position: center 22%; }
+
+  .choices--row { flex-direction: column; align-items: stretch; }
+  .choices--row .btn { width: 100%; }
+  .chip { width: 100%; text-align: left; }
+
+  .snapshot { float: none; margin: 0 auto 18px; width: 150px; }
+  .letter { padding: 24px 20px 30px; }
+
+  .final__actions .btn { width: 100%; }
+  .portrait { width: 160px; }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .portrait { width: 120px; margin-bottom: 16px; }
+  .intro__subtitle { margin-bottom: 1.2em; }
+}
+
+/* Respect people who ask their device for less motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* selected state for the two-button questions */
+.btn.is-selected { box-shadow: 0 0 0 2px var(--blush); }

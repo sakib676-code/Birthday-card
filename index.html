@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+<!-- ===================================================================
+     TITLE OF THE BROWSER TAB — you can change this text
+     =================================================================== -->
+<title>Happy Birthday Elin 🎂</title>
+  <meta property="og:title" content="Happy Birthday Elin! 🎂" />
+  <meta property="og:description" content="A special birthday surprise for you!" />
+  <meta property="og:type" content="website" />
+<!-- Google Fonts (optional). If you are offline, the site still works:
+     the fallback fonts in style.css take over automatically. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Caveat:wght@400;600&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="style.css" />
+</head>
+
+<body data-screen="1">
+
+<!-- =====================================================================
+     MUSIC BUTTON + PROGRESS DOTS
+     These float above every screen. They appear after "Start our story".
+     ===================================================================== -->
+<button id="musicToggle" class="music-toggle" type="button" hidden
+        aria-label="Mute the music">
+  <span class="music-toggle__bars" aria-hidden="true">
+    <i></i><i></i><i></i><i></i>
+  </span>
+</button>
+
+<nav id="progress" class="progress" hidden aria-label="Where you are in the story">
+  <!-- Dots are created by script.js -->
+</nav>
+
+<main id="app">
+
+  <!-- ===================================================================
+       SCREEN 1 — THE INTRO (cinematic)
+       Photo: images/photo1.jpg
+       =================================================================== -->
+  <section class="screen screen--intro is-active" id="screen-1" aria-label="Opening">
+    <canvas class="fx" id="heartsCanvas" aria-hidden="true"></canvas>
+    <div class="intro__aurora" aria-hidden="true"></div>
+
+    <div class="intro__inner">
+      <figure class="portrait">
+        <img src="images/photo1.jpg" alt="A photo of my favourite person" />
+      </figure>
+
+      <!-- ==== EDIT ME: intro words ==== -->
+      <p class="intro__eyebrow">for the best person I know</p>
+      <h1 class="intro__title">Happy Birthday,<br />Elin <span class="heart">❤</span></h1>
+      <p class="intro__subtitle">
+        I made you something small and a little silly, because a message
+        felt too short for everything you are to me.
+      </p>
+      <!-- ==== END EDIT ==== -->
+
+      <button class="btn btn--gold" id="startBtn" type="button">Start our story ❤️</button>
+      <p class="intro__hint">Sound on, if you can — there's music.</p>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       SCREEN 2 — THE QUESTION (polaroid on warm paper)
+       Photo: images/photo2.jpg
+       =================================================================== -->
+  <section class="screen screen--polaroid" id="screen-2" aria-label="A question" hidden>
+    <div class="paper__inner">
+      <figure class="polaroid">
+        <img src="images/photo2.jpg" alt="A photo of my favourite person" />
+        <figcaption>you, exactly as I like you</figcaption>
+      </figure>
+
+      <div class="polaroid__side">
+        <!-- ==== EDIT ME: question 1 ==== -->
+        <h2 class="question">Do you know how special you are to me?</h2>
+        <!-- ==== END EDIT ==== -->
+
+        <div class="choices choices--row">
+          <button class="btn btn--ink" type="button"
+                  data-q1="Of course ❤️"
+                  data-reply="Then you already know how much I love you ❤️">Of course ❤️</button>
+          <button class="btn btn--outline" type="button"
+                  data-q1="Maybe I need to prove it 😏"
+                  data-reply="Then keep going… I have something to show you.">Maybe I need to prove it 😏</button>
+        </div>
+
+        <p class="reply" id="q1Reply" role="status"></p>
+
+        <div class="nav">
+          <button class="nav__btn" type="button" data-go="prev">Back</button>
+          <button class="nav__btn nav__btn--next" type="button" data-go="next">Keep going</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       SCREEN 3 — THE MEMORY (full photo background)
+       Photo: images/photo3.jpg  (set as background in style.css)
+       =================================================================== -->
+  <section class="screen screen--memory" id="screen-3" aria-label="A memory" hidden>
+    <div class="memory__photo" aria-hidden="true"></div>
+    <img class="visually-hidden" src="images/photo3.jpg" alt="A photo of my favourite person" />
+
+    <div class="memory__inner">
+      <!-- ==== EDIT ME: memory message + question 2 ==== -->
+      <p class="memory__line">Some people enter our lives quietly…</p>
+      <p class="memory__line memory__line--big">and somehow become our favourite part of it.</p>
+      <h2 class="question question--light">What is your favourite thing about us?</h2>
+      <!-- ==== END EDIT ==== -->
+
+      <div class="choices choices--chips" id="q2Choices">
+        <!-- ==== EDIT ME: the four answers ==== -->
+        <button class="chip" type="button" data-q2="Your smile ❤️">Your smile ❤️</button>
+        <button class="chip" type="button" data-q2="Our late-night conversations 🌙">Our late-night conversations 🌙</button>
+        <button class="chip" type="button" data-q2="The way you understand me 🫶">The way you understand me 🫶</button>
+        <button class="chip" type="button" data-q2="Everything about us 💕">Everything about us 💕</button>
+        <!-- ==== END EDIT ==== -->
+      </div>
+
+      <div class="nav">
+        <button class="nav__btn" type="button" data-go="prev">Back</button>
+        <button class="nav__btn nav__btn--next" type="button" data-go="next">Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       SCREEN 4 — THE WISH (constellation)
+       Photo: images/photo4.jpg
+       =================================================================== -->
+  <section class="screen screen--wish" id="screen-4" aria-label="Make a wish" hidden>
+    <canvas class="fx" id="constellationCanvas" aria-hidden="true"></canvas>
+
+    <div class="wish__inner">
+      <figure class="orb">
+        <img src="images/photo4.jpg" alt="A photo of my favourite person" />
+      </figure>
+
+      <!-- ==== EDIT ME: question 3 ==== -->
+      <h2 class="question question--light">If you could make one wish for us, what would it be?</h2>
+      <!-- ==== END EDIT ==== -->
+
+      <label class="visually-hidden" for="wishInput">Your wish</label>
+      <textarea id="wishInput" class="wish__input" rows="4"
+                placeholder="Write it here. No one else will read it."></textarea>
+
+      <button class="btn btn--glass" id="saveWishBtn" type="button">Save my wish ✨</button>
+      <p class="reply reply--light" id="wishReply" role="status"></p>
+
+      <div class="nav">
+        <button class="nav__btn" type="button" data-go="prev">Back</button>
+        <button class="nav__btn nav__btn--next" type="button" data-go="next">Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       SCREEN 5 — THE LETTER (handwritten paper)
+       Photo: images/photo5.jpg
+       The letter text itself lives in script.js — look for LETTER_TEXT.
+       =================================================================== -->
+  <section class="screen screen--letter" id="screen-5" aria-label="A letter for you" hidden>
+    <div class="letter">
+      <figure class="snapshot">
+        <img src="images/photo5.jpg" alt="A photo of my favourite person" />
+      </figure>
+
+      <h2 class="letter__head">A letter, didn't you say that you love receiving my letters?</h2>
+      <p class="letter__body" id="letterText"></p>
+
+      <div class="nav nav--letter">
+        <button class="nav__btn" type="button" data-go="prev">Back</button>
+        <button class="nav__btn" type="button" id="skipTyping">Show all of it</button>
+        <button class="nav__btn nav__btn--next" type="button" data-go="next">One last thing</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       SCREEN 6 — THE LAST QUESTION (split screen)
+       Photo: images/photo7.jpg — swap to any photo you like
+       =================================================================== -->
+  <section class="screen screen--ask" id="screen-6" aria-label="One last question" hidden>
+    <div class="ask__photo">
+      <img src="images/photo7.jpg" alt="A photo of my favourite person" />
+    </div>
+
+    <div class="ask__inner">
+      <!-- ==== EDIT ME: final question ==== -->
+      <p class="ask__kicker">One last question…</p>
+      <h2 class="question question--light">
+        Will you stay with me and keep making beautiful memories together? ❤️
+      </h2>
+      <!-- ==== END EDIT ==== -->
+
+      <div class="choices choices--row">
+        <button class="btn btn--gold" type="button" data-q4="Yes ❤️">Yes ❤️</button>
+        <button class="btn btn--glass" type="button" data-q4="Always ❤️">Always ❤️</button>
+      </div>
+
+      <div class="nav">
+        <button class="nav__btn" type="button" data-go="prev">Back</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       FINAL SCREEN — CELEBRATION
+       Photo: images/photo6.jpg — swap to your favourite one
+       =================================================================== -->
+  <section class="screen screen--final" id="screen-7" aria-label="Happy birthday" hidden>
+    <canvas class="fx" id="celebrationCanvas" aria-hidden="true"></canvas>
+
+    <div class="final__inner">
+      <figure class="frame">
+        <img src="images/photo6.jpg" alt="A photo of my favourite person" />
+      </figure>
+
+      <!-- ==== EDIT ME: final message ==== -->
+      <h2 class="final__title">Happy Birthday, My Love ❤️</h2>
+      <p class="final__message">
+        Thank you for being born, for being difficult to forget, and for
+        making an ordinary year feel like something worth keeping.
+        Here's to every birthday after this one — I'd like to be there for all of them.
+      </p>
+      <!-- ==== END EDIT ==== -->
+
+      <div class="recap" id="recap">
+        <!-- Filled in by script.js with his answers -->
+      </div>
+
+      <div class="final__actions">
+        <button class="btn btn--gold" id="saveTxtBtn" type="button">Save our answers 💌</button>
+        <button class="btn btn--glass" id="saveJsonBtn" type="button">Save as JSON</button>
+        <button class="btn btn--ghost" id="replayBtn" type="button">Replay our story</button>
+      </div>
+      <p class="reply reply--light" id="saveReply" role="status"></p>
+    </div>
+  </section>
+
+</main>
+
+<!-- =====================================================================
+     THE MUSIC. Put your song at: audio/song.mp3
+     ===================================================================== -->
+<audio id="bgMusic" src="audio/song.mp3" loop preload="auto"></audio>
+
+<script src="script.js"></script>
+</body>
+</html>
